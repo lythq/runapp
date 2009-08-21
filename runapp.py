@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import sys, string, os, sqlite3
+from datetime import date
 
 def createdb():
     con = sqlite3.connect('run.db')
@@ -17,30 +18,33 @@ def createdb():
     c.close()
 
 def createplace():
-    print "Country:",
-    country = raw_input()
-    print "Town:",
-    town = raw_input()
-    print "Place:",
-    place = raw_input()
+    country = raw_input("Country: ")
+    town = raw_input("Town: ")
+    place = raw_input("Place: ")
     con = sqlite3.connect('run.db')
     c = con.cursor()
     c.execute("""insert into places
-          values (null, ?, ?, ?)""", (country, town, place))
+                 values (null, ?, ?, ?)""", (country, town, place))
     con.commit()
     c.close()
+    
+def createrun():
+    tod = date.today().isoformat()
+    rdate = raw_input("Date (default: " + tod + ") YYYY-MM-DD: ")
+    if( not( rdate)):
+        rdate = tod
+    print rdate
 
 if( not( os.path.isfile( 'run.db'))):
     createdb()
 command = -1
 while(command):
-    print "1. Insert run data"
+    print "\n1. Insert run data"
     print "2. Insert place data"
     print "0. Exit\n"
-    print "Choice:",
-    command = string.atoi( raw_input())
+    command = string.atoi( raw_input("Choice: "))
     if( command == 1):
-        pass
+        createrun()
     elif( command == 2):
         createplace()
 
