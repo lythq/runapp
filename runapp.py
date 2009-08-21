@@ -3,7 +3,7 @@
 
 import sys, string, os, sqlite3
 
-if( not( os.path.isfile( 'run.db'))):
+def createdb():
     con = sqlite3.connect('run.db')
     c = con.cursor()
     c.execute('''create table places
@@ -15,13 +15,33 @@ if( not( os.path.isfile( 'run.db'))):
      id_place integer references places)''')
     con.commit()
     c.close()
-    
+
+def createplace():
+    print "Country:",
+    country = raw_input()
+    print "Town:",
+    town = raw_input()
+    print "Place:",
+    place = raw_input()
+    con = sqlite3.connect('run.db')
+    c = con.cursor()
+    c.execute("""insert into places
+          values (null, ?, ?, ?)""", (country, town, place))
+    con.commit()
+    c.close()
+
+if( not( os.path.isfile( 'run.db'))):
+    createdb()
 command = -1
 while(command):
-    print("1. Insert run data")
-    print("2. Insert place data")
-    print("0. Exit\n")
+    print "1. Insert run data"
+    print "2. Insert place data"
+    print "0. Exit\n"
     print "Choice:",
     command = string.atoi( raw_input())
-    print(command)
+    if( command == 1):
+        pass
+    elif( command == 2):
+        createplace()
+
     
