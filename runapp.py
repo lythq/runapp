@@ -24,7 +24,7 @@ def createplace():
     con = sqlite3.connect('run.db')
     c = con.cursor()
     c.execute("""insert into places
-                 values (null, ?, ?, ?)""", (country, town, place))
+                 values (null, ?, ?, ?)""", (unicode(country, 'utf-8'), unicode(town, 'utf-8'), unicode(place, 'utf-8')))
     con.commit()
     c.close()
     
