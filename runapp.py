@@ -14,13 +14,14 @@ def createdb():
     c.execute('''create table places
     (id_place integer primary key, country text, town text,
      place text, obs_place text)''')
-    c.execute('''create table trains
-    (id_train integer primary key, duration_exp text, lim_min integer,
-     lim_max integer, zone_exp text, max_run text, obs_train text)''')
+    c.execute('''create table workouts
+    (id_workout integer primary key, duration_exp text, lim_min integer,
+     lim_max integer, zone_exp text, max_run text, desc_workout text, 
+     obs_workout text)''')
     c.execute('''create table runs
     (id_run integer primary key, date_run text, duration_run text, hravg integer,
      hrmax_run integer, zone_run text, id_place integer references places,
-     id_train integer references trains, obs_run text)''')
+     id_workout integer references workouts, obs_run text)''')
     con.commit()
     c.close()
     createhr()
@@ -38,18 +39,20 @@ def createhr():
     con.commit()
     c.close()
 
-def createtrain():
-    tdur = raw_input("Duration (HH:MM:SS): ")
-    tlmin = string.atoi( raw_input("Minimum heart rate: "))
-    tlmax = string.atoi( raw_input("Maximum heart rate: "))
-    tzone = raw_input("Time in training zone (HH:MM:SS): ")
-    trun = raw_input("Maximum contiguous run duration (HH:MM:SS): ")
+def createworkout():
+    wdur = raw_input("Duration (HH:MM:SS): ")
+    wlmin = string.atoi( raw_input("Minimum heart rate: "))
+    wlmax = string.atoi( raw_input("Maximum heart rate: "))
+    wzone = raw_input("Time in training zone (HH:MM:SS): ")
+    wrun = raw_input("Maximum contiguous run duration (HH:MM:SS): ")
+    wdesc = raw_input("Workout description: ")
     obs = raw_input("Notes: ")
     con = sqlite3.connect('run.db')
     c = con.cursor()
-    c.execute("""insert into trains
-                 values (null, ?, ?, ?, ?, ?, ?)""", 
-              (tdur, tlmin, tlmax, tzone, trun, unicode(obs, 'utf-8')))
+    c.execute("""insert into workouts
+                 values (null, ?, ?, ?, ?, ?, ?, ?)""", 
+              (wdur, wlmin, wlmax, wzone, wrun, unicode(wdesc, 'utf-8'),
+               unicode(obs, 'utf-8')))
     con.commit()
     c.close()
 
@@ -67,10 +70,10 @@ def createplace():
     con.commit()
     c.close()
     
-def listrains():
+def listworkouts():
     con = sqlite3.connect('run.db')
     c = con.cursor()
-    c.execute('select id_train, obs_train from trains order by id_train')
+    c.execute('select id_workout, desc_workout from workouts order by id_workout')
     print
     for row in c:
         print str(row[0]) + ". " + row[1]
@@ -94,8 +97,8 @@ def createrun():
         rdate = tod
     print rdate
     rdur = raw_input("Duration (HH:MM:SS): ")
-    listrains()
-    rtrain = string.atoi( raw_input("Running plan: "))
+    listworkouts()
+    rworkout = string.atoi( raw_input("Running plan: "))
     rhravg = string.atoi( raw_input("Average heart rate: "))
     rhrmax = string.atoi( raw_input("Maximum heart rate: "))
     rzone = raw_input("Time in training zone (HH:MM:SS): ")
@@ -106,7 +109,7 @@ def createrun():
     c = con.cursor()
     c.execute("""insert into runs
                  values (null, ?, ?, ?, ?, ?, ?, ?, ?)""", 
-              (rdate, rdur, rhravg, rhrmax, rzone, rplace, rtrain,
+              (rdate, rdur, rhravg, rhrmax, rzone, rplace, rworkout,
                unicode(robs, 'utf-8')))
     con.commit()
     c.close()
@@ -116,7 +119,7 @@ if( not( os.path.isfile( 'run.db'))):
 command = -1
 while(command):
     print "\n1. Insert run"
-    print "2. Insert train"
+    print "2. Insert workout"
     print "3. Insert place"
     print "4. Insert new maximum heart rate"
     print "0. Exit\n"
@@ -124,10 +127,8 @@ while(command):
     if( command == 1):
         createrun()
     elif(command == 2):
-        createtrain()
+        createworkout()
     elif( command == 3):
         createplace()
     elif( command == 4):
         createhr()
-
-    
